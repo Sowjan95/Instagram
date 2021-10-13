@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,11 +33,23 @@ public class PostsFragment extends Fragment {
     private RecyclerView rvPosts;
     protected PostsAdapter adapter;
     protected List<Post> allPosts;
+    SwipeRefreshLayout swipeContainer;
 
     public PostsFragment() {
         // Required empty public constructor
     }
 
+    // Clean all elements of the recycler
+    public void clear() {
+        allPosts.clear();
+        adapter.notifyDataSetChanged();
+    }
+
+    // Add a list of posts
+    public void addAll(List<Post> postsList) {
+        allPosts.addAll(postsList);
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,6 +61,15 @@ public class PostsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.i(TAG, "fetching new data");
+                queryPosts();
+            }
+        });
+
         rvPosts = view.findViewById(R.id.rvPosts);
 
         allPosts = new ArrayList<>();
@@ -79,8 +101,12 @@ public class PostsFragment extends Fragment {
                 for (Post post : posts) {
                     Log.i(TAG, "Post: " + post.getDescription() + ", username: " + post.getUser().getUsername());
                 }
-                allPosts.addAll(posts);
+                adapter.clear();
+                adapter.addAll(posts);
+                //allPosts.addAll(posts);
                 adapter.notifyDataSetChanged();
+                // Now we call setRefreshing(false) to signal refresh has finished
+                swipeContainer.setRefreshing(false);
             }
         });
     }

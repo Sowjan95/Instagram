@@ -1,6 +1,7 @@
 package com.example.instagramclone;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.ContentInfo;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.bumptech.glide.Glide;
 import com.parse.Parse;
@@ -19,8 +21,10 @@ import java.util.List;
 
 public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> {
 
+    String TAG = "PostsAdapter";
     private Context context;
     private List<Post> posts;
+    //SwipeRefreshLayout swipeContainer;
 
     public PostsAdapter(Context context, List<Post> posts){
         this.context = context;
@@ -45,6 +49,18 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
         return posts.size();
     }
 
+    // Clean all elements of the recycler
+    public void clear() {
+        posts.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of posts
+    public void addAll(List<Post> postsList) {
+        posts.addAll(postsList);
+        notifyDataSetChanged();
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView tvUsername;
@@ -56,6 +72,7 @@ public class PostsAdapter extends RecyclerView.Adapter<PostsAdapter.ViewHolder> 
             tvUsername = itemView.findViewById(R.id.tvUsername);
             ivImage = itemView.findViewById(R.id.ivImage);
             tvDescription = itemView.findViewById(R.id.tvDescription);
+            //swipeContainer = itemView.findViewById(R.id.swipeContainer);
         }
 
         public void bind(Post post) {
